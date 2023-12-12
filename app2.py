@@ -26,7 +26,7 @@ def get_text_chunks(text):
 
 def get_vector_store(text_chunks):
     embeddings = GooglePalmEmbeddings()
-    vector_store = FAISS.from_texts(text_chunks, embeddings)  # Corrected the parameter name
+    vector_store = FAISS.from_texts(text_chunks, embeddings)
     return vector_store
 
 def get_conversational_chain(vector_store):
@@ -36,17 +36,20 @@ def get_conversational_chain(vector_store):
     return conversation_chain
 
 def user_input(user_question):
-    # Ensure conversation is initialized before using it
-    if st.session_state.conversation is None:
-        st.session_state.conversation = get_conversational_chain(None)  # Provide a default vector_store (e.g., None)
+    try:
+        # Ensure conversation is initialized before using it
+        if st.session_state.conversation is None:
+            st.session_state.conversation = get_conversational_chain(None)  # Provide a default vector_store (e.g., None)
 
-    response = st.session_state.conversation({'question': user_question})
-    st.session_state.chatHistory = response['chat_history']
-    for i, message in enumerate(st.session_state.chatHistory):
-        if i % 2 == 0:
-            st.write("Human: ", message.content)
-        else:
-            st.write("Bot: ", message.content)
+        response = st.session_state.conversation({'question': user_question})
+        st.session_state.chatHistory = response['chat_history']
+        for i, message in enumerate(st.session_state.chatHistory):
+            if i % 2 == 0:
+                st.write("Human: ", message.content)
+            else:
+                st.write("Bot: ", message.content)
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 
 def main():
     st.set_page_config("Chat with Multiple PDFs")
@@ -63,12 +66,15 @@ def main():
         st.subheader("Upload your Documents")
         pdf_docs = st.file_uploader("Upload your PDF Files and Click on the Process Button", accept_multiple_files=True)
         if st.button("Process"):
-            with st.spinner("Processing"):
-                raw_text = get_pdf_text(pdf_docs)
-                text_chunks = get_text_chunks(raw_text)
-                vector_store = get_vector_store(text_chunks)
-                st.session_state.conversation = get_conversational_chain(vector_store)  # Pass the vector_store
-                st.success("Done")
+            try:
+                with st.spinner("Processing"):
+                    raw_text = get_pdf_text(pdf_docs)
+                    text_chunks = get_text_chunks(raw_text)
+                    vector_store = get_vector_store(text_chunks)
+                    st.session_state.conversation = get_conversational_chain(vector_store)  # Pass the vector_store
+                    st.success("Done")
+            except Exception as e:
+                st.error(f"An error occurred during processing: {str(e)}")
 
 if __name__ == "__main__":
     main()
