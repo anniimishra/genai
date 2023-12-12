@@ -1,0 +1,7 @@
+langchain
+PyPDF2
+streamlit
+google-generativeai
+faiss-cpu
+altair
+tiktoken
