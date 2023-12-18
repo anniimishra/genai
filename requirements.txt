@@ -5,3 +5,6 @@ google-generativeai
 faiss-cpu
 altair
 tiktoken
+fastapi
+uvicorn
+fastapi-socketio
