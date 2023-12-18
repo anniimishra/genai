@@ -8,3 +8,4 @@ tiktoken
 fastapi
 uvicorn
 fastapi-socketio
+urllib3
